@@ -1,0 +1,67 @@
+%%
+%{
+	String auxElen, auxIden, auxCDec, auxCOc, auxCHex, auxComen, auxComenL;
+%}
+
+%init{
+	auxElen = "";
+	auxIden = "";
+	auxCDec = "";
+	auxCOc = "0";
+	auxCHex = "0x";
+	auxComen = "//";
+	auxComenL = "*/"; 
+%init}
+%standalone
+SIGNO = [+-];
+%xstates ELEN, IDEN, CONSDEC, CONSOC, CONSHEX, COMEN, COMENLIST;
+
+%%
+
+["]	{yybegin(ELEN);}
+[a-zA-Z$] {auxIden = auxIden+yytext(); yybegin(IDEN);}
+[+-]	{auxCDec = auxCDec+yytext();}
+[0-9]   {auxCDec = auxCDec+yytext(); yybegin(CONSDEC);}
+"0"SIGNO?  {if(yytext()!=0){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
+"0x"SIGNO? {if(yytext()!="x"){auxCHex = auxCHex+yytext();} yybegin(CONSHEX);}
+"//"	{yybegin(COMEN);}	
+"/*"	{yybegin(COMENLIST);}
+[^]	{;}
+
+<ELEN> {
+	[a-zA-Z]+	{auxElen = auxElen+yytext();}
+	["]		{System.out.println(auxElen); yybegin(YYINITIAL)}
+}
+
+<IDEN> {
+	[a-zA-Z0-9$_]+	{auxIden = auxIden+yytext();}
+	[^]		{System.out.println(auxIden); yybegin(YYINITIAL);}
+}
+
+<CONSDEC> {
+	[0-9]+	{auxCDec = auxCDec+yytext();}
+	"."	{auxCDec = auxCDec+yytext();}
+	[^]	{System.out.println(auxCDec); yybegin(YYINITIAL);}
+}
+
+<CONSOC> {
+	"."	{auxCOc = auxCOc+yytext();}
+	[0-7]+	{auxCOc = auxCOc+yytext();}
+	[^]	{System.out.println(auxCOc); yybegin(YYINITIAL);}
+}
+
+<CONSHEX> {
+	"."	{auxCHex = auxCHex+yytext();}
+	[0-9A-F]+	{auxCHex = auxCHex+yytext();}
+	[^]	{System.out.println(auxCHex); yybegin(YYINITIAL);}
+}
+
+<COMEN> {
+	"\n" {System.out.println(auxComen); yybegin(YYINITIAL);}
+	[.]+ {auxComen = auxComen+yytext();}
+}
+
+<COMENLIST> {
+	"*/" {System.out.println(auxComenL); yybegin(YYINITIAL);}
+	[^]+ {auxComenL = auxComenL+yytext();}	
+}
