@@ -1,3 +1,4 @@
+
 %%
 %{
 	String auxElen, auxIden, auxCDec, auxCOc, auxCHex, auxComen, auxComenL;
@@ -13,24 +14,22 @@
 	auxComenL = "*/"; 
 %init}
 %standalone
-SIGNO = [+-];
-%xstates ELEN, IDEN, CONSDEC, CONSOC, CONSHEX, COMEN, COMENLIST;
+%xstates ELEN, IDEN, CONSDEC, CONSOC, CONSHEX, COMEN, COMENLIST
 
 %%
 
-["]	{yybegin(ELEN);}
+[\"]	{yybegin(ELEN);}
 [a-zA-Z$] {auxIden = auxIden+yytext(); yybegin(IDEN);}
-[+-]	{auxCDec = auxCDec+yytext();}
-[0-9]   {auxCDec = auxCDec+yytext(); yybegin(CONSDEC);}
-"0"SIGNO?  {if(yytext()!=0){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
-"0x"SIGNO? {if(yytext()!="x"){auxCHex = auxCHex+yytext();} yybegin(CONSHEX);}
+[+-]?[0-9]   {auxCDec = auxCDec+yytext(); yybegin(CONSDEC);}
+"0"[+-]?  {if(yytext()!=0){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
+"0x"[+-]? {if(yytext()!="x"){auxCHex = auxCHex+yytext();} yybegin(CONSHEX);}
 "//"	{yybegin(COMEN);}	
 "/*"	{yybegin(COMENLIST);}
 [^]	{;}
 
 <ELEN> {
 	[a-zA-Z]+	{auxElen = auxElen+yytext();}
-	["]		{System.out.println(auxElen); yybegin(YYINITIAL)}
+	[\"]		{System.out.println(auxElen); yybegin(YYINITIAL)}
 }
 
 <IDEN> {
