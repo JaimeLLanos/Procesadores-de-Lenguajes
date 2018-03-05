@@ -1,0 +1,27 @@
+
+Tenemos un "id" con una "constante"
+
+esto es un $identiificador y esto es _otr0
+
++123
+-69
+
+0+123
+0-64
+
+0x+123
+0xFFFF
+
++123.456
+0-64.77
+
+0x0.FFFF
+0x-E.A6F9
+
+'constante literal con \'contenido\' entrecomillado'
+
+//Este es un comentario de una linea
+
+/*aqui tenemos algun comentario
+con numeros 123450, de varias
+lineas*/
