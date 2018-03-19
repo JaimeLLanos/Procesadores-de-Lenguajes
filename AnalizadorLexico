@@ -1,5 +1,4 @@
 
-
 %%
 %{
 	String auxElen, auxIden, auxCDec, auxCOc, auxCHex, auxComen, auxComenL;
@@ -12,7 +11,7 @@
 	auxCOc = "0";
 	auxCHex = "0x";
 	auxComen = "//";
-	auxComenL = "*/"; 
+	auxComenL = "/*"; 
 %init}
 %standalone
 %xstates ELEN, IDEN, CONSDEC, CONSOC, CONSHEX, COMEN, COMENLIST
@@ -22,46 +21,46 @@
 [\"]	{yybegin(ELEN);}
 [a-zA-Z$] {auxIden = auxIden+yytext(); yybegin(IDEN);}
 [+-]?[0-9]   {auxCDec = auxCDec+yytext(); yybegin(CONSDEC);}
-"0"[+-]?  {if(yytext()!=0){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
-"0x"[+-]? {if(yytext()!="x"){auxCHex = auxCHex+yytext();} yybegin(CONSHEX);}
+"0"[+-]?  {if((yytext()=="+")||(yytext()=="-")){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
+"0x"[+-]? {if((yytext()=="+")||(yytext()=="-")){auxCOc = auxCOc+yytext();} yybegin(CONSHEX);}
 "//"	{yybegin(COMEN);}	
 "/*"	{yybegin(COMENLIST);}
 [^]	{;}
 
 <ELEN> {
 	[a-zA-Z]+	{auxElen = auxElen+yytext();}
-	[\"]		{System.out.println(auxElen+"--Esto iba entre comillas--"); yybegin(YYINITIAL)}
+	[\"]		{System.out.println(auxElen+"--Esto iba entre comillas--"); auxElen = ""; yybegin(YYINITIAL);}
 }
 
 <IDEN> {
 	[a-zA-Z0-9$_]+	{auxIden = auxIden+yytext();}
-	[^]		{System.out.println(auxIden+"--Esto es un identificador del lenguaje--"); yybegin(YYINITIAL);}
+	[^]		{System.out.println(auxIden+"--Esto es un identificador del lenguaje--"); auxIden = ""; yybegin(YYINITIAL);}
 }
 
 <CONSDEC> {
 	[0-9]+	{auxCDec = auxCDec+yytext();}
 	"."	{auxCDec = auxCDec+yytext();}
-	[^]	{System.out.println(auxCDec+"--Esto es una constante decimal--"); yybegin(YYINITIAL);}
+	[^]	{System.out.println(auxCDec+"--Esto es una constante decimal--"); auxCDec = ""; yybegin(YYINITIAL);}
 }
 
 <CONSOC> {
 	"."	{auxCOc = auxCOc+yytext();}
 	[0-7]+	{auxCOc = auxCOc+yytext();}
-	[^]	{System.out.println(auxCOc+"--Esto es una constante octal--"); yybegin(YYINITIAL);}
+	[^]	{System.out.println(auxCOc+"--Esto es una constante octal--"); auxCOc = "0"; yybegin(YYINITIAL);}
 }
 
 <CONSHEX> {
 	"."	{auxCHex = auxCHex+yytext();}
 	[0-9A-F]+	{auxCHex = auxCHex+yytext();}
-	[^]	{System.out.println(auxCHex+"--Esto es una constante hexadecimal--"); yybegin(YYINITIAL);}
+	[^]	{System.out.println(auxCHex+"--Esto es una constante hexadecimal--"); auxCHex = "0x"; yybegin(YYINITIAL);}
 }
 
 <COMEN> {
-	"\n" {System.out.println(auxComen+"--Esto es un comentario de linea--"); yybegin(YYINITIAL);}
+	"\n" {System.out.println(auxComen+"--Esto es un comentario de linea--"); auxComen = "//"; yybegin(YYINITIAL);}	
 	[.]+ {auxComen = auxComen+yytext();}
 }
 
 <COMENLIST> {
-	"*/" {System.out.println(auxComenL+"--Esto es un comentaria--"); yybegin(YYINITIAL);}
-	[^]+ {auxComenL = auxComenL+yytext();}	
+	"*/" {auxComenL = auxComenL+"*/"; System.out.println(auxComenL+"--Esto es un comentario--"); auxComenL = "*/"; yybegin(YYINITIAL);}	
+	[^"*/"]+ {auxComenL = auxComenL+yytext();}		
 }
