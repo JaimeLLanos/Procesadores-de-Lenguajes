@@ -1,66 +1,41 @@
 
-%%
-%{
-	String auxElen, auxIden, auxCDec, auxCOc, auxCHex, auxComen, auxComenL;
-%}
-
-%init{
-	auxElen = "";
-	auxIden = "";
-	auxCDec = "";
-	auxCOc = "0";
-	auxCHex = "0x";
-	auxComen = "//";
-	auxComenL = "/*"; 
-%init}
-%standalone
-%xstates ELEN, IDEN, CONSDEC, CONSOC, CONSHEX, COMEN, COMENLIST
 
 %%
 
-[\"]	{yybegin(ELEN);}
-[a-zA-Z$] {auxIden = auxIden+yytext(); yybegin(IDEN);}
-[+-]?[0-9]   {auxCDec = auxCDec+yytext(); yybegin(CONSDEC);}
-"0"[+-]?  {if((yytext()=="+")||(yytext()=="-")){auxCOc = auxCOc+yytext();} yybegin(CONSOC);}	
-"0x"[+-]? {if((yytext()=="+")||(yytext()=="-")){auxCOc = auxCOc+yytext();} yybegin(CONSHEX);}
-"//"	{yybegin(COMEN);}	
-"/*"	{yybegin(COMENLIST);}
-[^]	{;}
+%cup
+%class AnalizadorLexico
+%line
+%column
+%xstates COMILLAS
 
-<ELEN> {
-	[a-zA-Z]+	{auxElen = auxElen+yytext();}
-	[\"]		{System.out.println(auxElen+"--Esto iba entre comillas--"); auxElen = ""; yybegin(YYINITIAL);}
-}
+%%
 
-<IDEN> {
-	[a-zA-Z0-9$_]+	{auxIden = auxIden+yytext();}
-	[^]		{System.out.println(auxIden+"--Esto es un identificador del lenguaje--"); auxIden = ""; yybegin(YYINITIAL);}
-}
+[+-]?[0-9]+		{return new java_cup.runtime.Symbol(sym.numeric_integer_const, yyline, yycolumn);}
 
-<CONSDEC> {
-	[0-9]+	{auxCDec = auxCDec+yytext();}
-	"."	{auxCDec = auxCDec+yytext();}
-	[^]	{System.out.println(auxCDec+"--Esto es una constante decimal--"); auxCDec = ""; yybegin(YYINITIAL);}
-}
+[+-]?[0-9]+"."[0-9]+		{return new java_cup.runtime.Symbol(sym.numeric_real_const, yyline, yycolumn);}
 
-<CONSOC> {
-	"."	{auxCOc = auxCOc+yytext();}
-	[0-7]+	{auxCOc = auxCOc+yytext();}
-	[^]	{System.out.println(auxCOc+"--Esto es una constante octal--"); auxCOc = "0"; yybegin(YYINITIAL);}
-}
+"0"[+-]?[0-7]+            {return new java_cup.runtime.Symbol(sym.numeric_integer_const, yyline, yycolumn);}
 
-<CONSHEX> {
-	"."	{auxCHex = auxCHex+yytext();}
-	[0-9A-F]+	{auxCHex = auxCHex+yytext();}
-	[^]	{System.out.println(auxCHex+"--Esto es una constante hexadecimal--"); auxCHex = "0x"; yybegin(YYINITIAL);}
-}
+"0"[+-]?[0-7]+"."[0-7]+        {return new java_cup.runtime.Symbol(sym.numeric_real_const, yyline, yycolumn);}
 
-<COMEN> {
-	"\n" {System.out.println(auxComen+"--Esto es un comentario de linea--"); auxComen = "//"; yybegin(YYINITIAL);}	
-	[.]+ {auxComen = auxComen+yytext();}
-}
+"0x"[+-]?[0-9A-F]+        {return new java_cup.runtime.Symbol(sym.numeric_integer_const, yyline, yycolumn);}
 
-<COMENLIST> {
-	"*/" {auxComenL = auxComenL+"*/"; System.out.println(auxComenL+"--Esto es un comentario--"); auxComenL = "*/"; yybegin(YYINITIAL);}	
-	[^"*/"]+ {auxComenL = auxComenL+yytext();}		
-}
+"0x"[+-]?[0-9A-F]+"."[0-9A-F]+    {return new java_cup.runtime.Symbol(sym.numeric_real_const, yyline, yycolumn);}
+
+[a-zA-Z$][a-zA-Z0-9$_]*        {return new java_cup.runtime.Symbol(sym.ident, yyline, yycolumn);}
+
+"'"[^]"'"		{return new java_cup.runtime.Symbol(sym.constlit,yyline, yycolumn, yytext());}
+
+'//'		{;}
+
+'/*'[.]|/n'*/'		{;}
+
+
+" "		{;}
+
+\n|\r|\t	{;}
+
+.		{System.out.println("Error en el analizador lexico: " + yytext() + " en la linea " + yyline + " y el caracter de la posicion " + yycolumn);}
+
+
+
