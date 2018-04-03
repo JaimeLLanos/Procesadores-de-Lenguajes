@@ -1,4 +1,4 @@
-
+import java_cup.runtime.*;
 %%
 
 %cup
@@ -65,9 +65,9 @@
 
 "'"[^]"'"		{return new java_cup.runtime.Symbol(sym.constlit,yyline, yycolumn, yytext());}
 
-'//'		{;}
+"//"		{;}
 
-'/*'[.]|/n'*/'		{;}
+"/*"[^]"*/"		{;}
 
 
 " "		{;}
