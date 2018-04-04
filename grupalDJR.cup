@@ -1,0 +1,50 @@
+import java_cup.runtime.*;
+action code {::}
+
+parser code{:
+public void syntax_error(Symbol s) {public void syntax_error(Symbol s){
+
+		report_error("Error de sintaxis en la linea " + s.left + " caracter " + s.right + "\n", 		null);
+
+	}
+
+	
+	public void syntax_error(){
+
+		report_error("Error no puede haber dos funciones principales en el programa ", null);
+
+	}
+
+	
+	public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+
+		report_error("" , null);
+
+	}
+
+:}
+
+terminal define, aperturaParentesis, cierreParentesis, aperturaLlaves, vvoid, cierreLlaves, coma, vint, vfloat, punto_coma, mas, menos, mult, diventera, divreal, numeric_integer_const, numeric_real_const, constlit, igual, vreturn, ident;
+
+non terminal  PROGRAM, DEFINES, PARTES, CTES, PART, RESTPART, BLQ, LISTPARAM, TYPE, SENTLIST, SENT, LID, EXP, LEXP, OP, FACTOR;
+
+precedence left mult, diventera, divreal;
+precedence left mas, menos;
+
+PROGRAM ::= DEFINES PARTES;
+DEFINES ::=define ident CTES DEFINES |;
+CTES ::= numeric_integer_const | numeric_real_const | constlit;
+PARTES ::= PART PARTES | PART;
+PART ::= TYPE RESTPART;
+RESTPART ::= ident aperturaParentesis LISTPARAM cierreParentesis BLQ | ident aperturaParentesis vvoid cierreParentesis BLQ;
+BLQ ::= aperturaLlaves SENTLIST cierreLlaves;
+LISTPARAM ::= LISTPARAM coma TYPE ident | TYPE ident;
+TYPE ::= vvoid | vint | vfloat;
+
+SENTLIST ::= SENTLIST SENT | SENT;
+SENT ::= TYPE LID punto_coma | ident igual EXP punto_coma | ident aperturaParentesis LEXP cierreParentesis punto_coma | ident aperturaParentesis cierreParentesis punto_coma | vreturn EXP punto_coma;
+LID ::= ident | LID coma ident;
+LEXP ::= EXP | LEXP coma EXP;
+EXP ::= EXP OP EXP | FACTOR;
+OP ::= mas | menos | mult | diventera | divreal;
+FACTOR ::= ident aperturaParentesis LEXP cierreParentesis | ident aperturaParentesis cierreParentesis | aperturaParentesis EXP cierreParentesis | ident | CTES;
