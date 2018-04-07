@@ -1,0 +1,83 @@
+
+%%
+
+
+%standalone
+%xstate COMENLISTA, COMENLINEA, OPCION
+%%
+
+
+/* VARIABLES NECESARIAS */
+
+"#define" {System.out.println(" ");}
+
+"(" {System.out.println("aperturaParentesis");}
+
+")" {System.out.println("cierreParentesis");}
+
+"{" {System.out.println("aperturaLlaves");}
+
+"}" {System.out.println("cierreLlaves");}
+
+"void" {System.out.println("vvoid");}
+
+"," {System.out.println("coma");}
+
+"int" {System.out.println("vint");}
+
+"float" {System.out.println("vfloat");}
+
+"return" {System.out.println("vreturn");}
+
+";" {System.out.println("punto_coma");}
+
+"=" {System.out.println("igual");}
+
+"+" {System.out.println("mas");}
+
+"-" {System.out.println("menos");}
+
+"*" {System.out.println("mult");}
+
+"/" {yybegin(OPCION);}
+
+"%" {System.out.println("divreal");}
+
+<OPCION> {
+	[/] {yybegin(COMENLINEA);}
+	[*] {yybegin(COMENLISTA);}
+	[^] {System.out.println("divreal"); yybegin(YYINITIAL);}
+}
+
+<COMENLINEA> {
+	[.]	{;}
+	[\n]	{System.out.println("aqui iba un comentario de linea"); yybegin(YYINITIAL);}
+}	
+
+<COMENLISTA> {
+	"*/"	{System.out.println("aqui iba un comentario en lista"); yybegin(YYINITIAL);}
+	[^]	{;}
+}
+
+
+/* VARIABLES ENUNCIADO */
+
+[+-]?[0-9]+ {System.out.println("numeric_integer_const");}
+
+[+-]?[0-9]+"."[0-9]+ {System.out.println("numeric_real_const");}
+
+"0"[+-]?[0-7]+ {System.out.println("numeric_integer_const");}
+
+"0"[+-]?[0-7]+"."[0-7]+ {System.out.println("numeric_real_const");}
+
+"0x"[+-]?[0-9A-F]+ {System.out.println("numeric_integer_const");}
+
+"0x"[+-]?[0-9A-F]+"."[0-9A-F]+ {System.out.println("numeric_real_const");}
+
+[a-zA-Z$][a-zA-Z0-9$_]* {System.out.println("ident");}
+
+"'"[^]"'" {System.out.println("constlit");}
+
+" " {;}
+
+\n|\r|\t {;}
