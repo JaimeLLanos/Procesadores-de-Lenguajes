@@ -1,0 +1,11 @@
+#define HOLA=5;
+
+int main(){
+	int x, y, c;
+	x=5;
+	y=19;
+	c=x+y;
+	printf(c);
+	c=y-x;
+	printf(c);
+}
