@@ -1,0 +1,8 @@
+int main(){
+float 1.2;
+	b=8.59/3;
+	b=b*2;
+	/* esto 
+	es un comentario
+	de varias lineas */
+}

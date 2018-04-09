@@ -1,0 +1,15 @@
+void escribe(){
+	printf('hola');
+}
+
+int suma(int a, int b){
+	int c;
+	c=a+b;
+	return c;
+}
+int main(){
+	escribe();
+	int a,b;
+	a=4;
+	b=5;	
+}
