@@ -1,0 +1,5 @@
+#dfine H=3;
+
+int main() {
+	int c
+}

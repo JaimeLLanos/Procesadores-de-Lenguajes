@@ -1,0 +1,15 @@
+#define T 5
+int main(){
+	int j;
+	float k;
+	k=50.25;
+	j=k/3.2;
+	//comentario
+	/*
+		H
+		O
+		L
+		A
+
+	*/
+}
