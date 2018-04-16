@@ -3,7 +3,7 @@
 
 
 %standalone
-%xstate COMENLISTA, COMENLINEA, OPCION
+%xstate COMENLISTA, COMENLINEA, OPCION, MENOR, MAYOR, IGUAL
 %%
 
 
@@ -31,7 +31,7 @@
 
 ";" {System.out.println("punto_coma");}
 
-"=" {System.out.println("igual");}
+"=" {yybegin(IGUAL);}
 
 "+" {System.out.println("mas");}
 
@@ -43,22 +43,57 @@
 
 "%" {System.out.println("divreal");}
 
+"||" {System.out.println("or_logic");}
+
+"&&" {System.out.println("and_logic");}
+
+"<" {yybegin(MENOR);}
+
+">" {yybegin(MAYOR);}	
+
+"!" {System.out.println("negacion");}
+
+"if" {System.out.println("vif");}
+
+"while" {System.out.println("vwhile");}
+
+"do" {System.out.println("vdo");}
+
+"until" {System.out.println("vuntil");}
+
+"else" {System.out.println("velse");}
+ 
+"for" {System.out.println("vfor");}
+ 
+
 <OPCION> {
 	[/] {yybegin(COMENLINEA);}
 	[*] {yybegin(COMENLISTA);}
-	[^] {System.out.println("divreal"); yybegin(YYINITIAL);}
+	[^] {yypushback(1); System.out.println("divreal"); yybegin(YYINITIAL);}
 }
 
 <COMENLINEA> {
-	[.]	{;}
-	[\n]	{System.out.println("aqui iba un comentario de linea"); yybegin(YYINITIAL);}
+	~[\n]	{System.out.println("aqui iba un comentario de linea"); yybegin(YYINITIAL);}
 }	
 
 <COMENLISTA> {
-	"*/"	{System.out.println("aqui iba un comentario en lista"); yybegin(YYINITIAL);}
-	[^]	{;}
+	~"*/"	{System.out.println("aqui iba un comentario en lista"); yybegin(YYINITIAL);}
 }
 
+<IGUAL> {
+	[=] {System.out.println("comp_igual"); yybegin(YYINITIAL);}
+	[^] {yypushback(1); System.out.println("igual"); yybegin(YYINITIAL);}
+}
+
+<MENOR> {
+	[=] {System.out.println("menor_igual_que"); yybegin(YYINITIAL);}
+	[^] {yypushback(1); System.out.println("menor_que"); yybegin(YYINITIAL);}
+}
+
+<MAYOR> {
+	[=] {System.out.println("mayor_igual_que"); yybegin(YYINITIAL);}
+	[^] {yypushback(1); System.out.println("mayor_que"); yybegin(YYINITIAL);}
+}
 
 /* VARIABLES ENUNCIADO */
 
