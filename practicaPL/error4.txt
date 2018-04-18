@@ -1,0 +1,3 @@
+int main()
+	int suma = 1+1;
+}

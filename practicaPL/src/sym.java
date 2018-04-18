@@ -6,29 +6,43 @@
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int define = 2;
-  public static final int coma = 8;
-  public static final int mult = 14;
-  public static final int numeric_integer_const = 17;
-  public static final int divreal = 16;
-  public static final int vvoid = 6;
+  public static final int menor_igual_que = 30;
+  public static final int velse = 32;
+  public static final int mayor_que = 28;
   public static final int numeric_real_const = 18;
-  public static final int vfloat = 10;
-  public static final int menos = 13;
-  public static final int diventera = 15;
-  public static final int ident = 22;
-  public static final int constlit = 19;
+  public static final int vint = 9;
+  public static final int vuntil = 35;
+  public static final int coma = 8;
+  public static final int vfor = 36;
+  public static final int vreturn = 21;
   public static final int igual = 20;
-  public static final int EOF = 0;
   public static final int aperturaLlaves = 5;
   public static final int cierreParentesis = 4;
-  public static final int vint = 9;
-  public static final int vreturn = 21;
-  public static final int error = 1;
-  public static final int cierreLlaves = 7;
-  public static final int aperturaParentesis = 3;
-  public static final int mas = 12;
+  public static final int menor_que = 27;
+  public static final int divreal = 16;
+  public static final int menos = 13;
+  public static final int EOF = 0;
   public static final int punto_coma = 11;
+  public static final int ident = 22;
+  public static final int mas = 12;
+  public static final int vdo = 34;
+  public static final int error = 1;
+  public static final int vwhile = 33;
+  public static final int cierreLlaves = 7;
+  public static final int negacion = 23;
+  public static final int vfloat = 10;
+  public static final int define = 2;
+  public static final int mult = 14;
+  public static final int aperturaParentesis = 3;
+  public static final int or_logic = 24;
+  public static final int mayor_igual_que = 29;
+  public static final int diventera = 15;
+  public static final int numeric_integer_const = 17;
+  public static final int comp_igual = 26;
+  public static final int constlit = 19;
+  public static final int vvoid = 6;
+  public static final int vif = 31;
+  public static final int and_logic = 25;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -52,7 +66,21 @@ public class sym {
   "constlit",
   "igual",
   "vreturn",
-  "ident"
+  "ident",
+  "negacion",
+  "or_logic",
+  "and_logic",
+  "comp_igual",
+  "menor_que",
+  "mayor_que",
+  "mayor_igual_que",
+  "menor_igual_que",
+  "vif",
+  "velse",
+  "vwhile",
+  "vdo",
+  "vuntil",
+  "vfor"
   };
 }
 

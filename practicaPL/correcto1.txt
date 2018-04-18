@@ -1,0 +1,23 @@
+int main(){
+	int x, y, c, i;
+	x=1;
+	if(x <= 1){
+		x=5;
+	}
+	else{
+		while(x>1){			
+			x=4;
+		}
+	}
+	for(i=0; i<x; i=5){
+		c = c + 1;
+	}
+	do{
+		y = y + x;
+	}until(y > c)
+	y=19;
+	c=x+y;
+	printf(c);
+	c=y-x;
+	printf(c);
+}
