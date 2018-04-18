@@ -38,7 +38,7 @@ PARTES ::= PART PARTES | PART;
 PART ::= TYPE RESTPART;
 RESTPART ::= ident aperturaParentesis LISTPARAM cierreParentesis BLQ | ident aperturaParentesis vvoid cierreParentesis BLQ;
 BLQ ::= aperturaLlaves SENTLIST cierreLlaves;
-LISTPARAM ::= LISTPARAM coma TYPE ident | TYPE ident|;
+LISTPARAM ::= LISTPARAM coma TYPE ident | TYPE ident;
 TYPE ::= vvoid | vint | vfloat;
 
 SENTLIST ::= SENTLIST SENT | SENT;
