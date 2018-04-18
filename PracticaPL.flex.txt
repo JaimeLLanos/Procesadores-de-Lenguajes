@@ -6,7 +6,7 @@ import java_cup.runtime.*;
 %class AnalizadorLexico
 %line
 %column
-%xstate COMENLISTA, COMENLINEA, OPCION
+%xstate COMENLISTA, COMENLINEA, OPCION, MENOR, MAYOR, IGUAL
 %%
 
 /* VARIABLES NECESARIAS */
@@ -41,24 +41,59 @@ import java_cup.runtime.*;
 	
 "*"  {return new java_cup.runtime.Symbol(sym.mult,yyline, yycolumn);}
 	
-"%"  {return new java_cup.runtime.Symbol(sym.divreal,yyline, yycolumn);}
+"%"  {return new java_cup.runtime.Symbol(sym.diventera,yyline, yycolumn);}
 
-"/"  {yybegin(OPCION); return new java_cup.runtime.Symbol(sym.diventera,yyline, yycolumn);}
-	
+"/"  {yybegin(OPCION);}
+
+"||" {return new java_cup.runtime.Symbol(sym.or_logic,yyline, yycolumn);}
+
+"&&" {return new java_cup.runtime.Symbol(sym.and_logic,yyline, yycolumn);}
+
+"<" {yybegin(MENOR);}
+
+">" {yybegin(MAYOR);}	
+
+"!" {return new java_cup.runtime.Symbol(sym.negacion,yyline,yycolumn);}
+
+"if" {return new java_cup.runtime.Symbol(sym.vif,yyline,yycolumn);}
+
+"while" {return new java_cup.runtime.Symbol(sym.vwhile,yyline,yycolumn);}
+
+"do" {return new java_cup.runtime.Symbol(sym.vdo,yyline,yycolumn);}
+
+"until" {return new java_cup.runtime.Symbol(sym.vuntil,yyline,yycolumn);}
+
+"else" {return new java_cup.runtime.Symbol(sym.velse,yyline,yycolumn);}
+ 
+"for" {return new java_cup.runtime.Symbol(sym.vfor,yyline,yycolumn);}
+ 	
 <OPCION> {
 	[/] {yybegin(COMENLINEA);}
 	[*] {yybegin(COMENLISTA);}
-	[^] {yybegin(YYINITIAL); return new java_cup.runtime.Symbol(sym.diventera,yyline, yycolumn);}
+	[^] {yypushback(1); yybegin(YYINITIAL); return new java_cup.runtime.Symbol(sym.divreal,yyline, yycolumn);}
 }
 
 <COMENLINEA> {
-	[.]	{;}
-	[\n]	{yybegin(YYINITIAL);}
+	~[\n]	{yybegin(YYINITIAL);}
 }	
 
 <COMENLISTA> {
-	"*/"	{yybegin(YYINITIAL);}
-	[^]	{;}
+	~"*/"	{yybegin(YYINITIAL);}
+}
+
+<IGUAL> {
+	[=] {return new java_cup.runtime.Symbol(sym.comp_igual,yyline,yycolumn); yybegin(YYINITIAL);}
+	[^] {yypushback(1); return new java_cup.runtime.Symbol(sym.igual,yyline,yycolumn); yybegin(YYINITIAL);}
+}
+
+<MENOR> {
+	[=] {return new java_cup.runtime.Symbol(sym.menor_igual_que,yyline,yycolumn); yybegin(YYINITIAL);}
+	[^] {yypushback(1); return new java_cup.runtime.Symbol(sym.menor_que,yyline,yycolumn); yybegin(YYINITIAL);}
+}
+
+<MAYOR> {
+	[=] {return new java_cup.runtime.Symbol(sym.mayor_igual_que,yyline,yycolumn); yybegin(YYINITIAL);}
+	[^] {yypushback(1); return new java_cup.runtime.Symbol(sym.mayor_que,yyline,yycolumn); yybegin(YYINITIAL);}
 }
 
 /* IDENTIFICADORES ENUNCIADO */
@@ -77,7 +112,7 @@ import java_cup.runtime.*;
 
 [a-zA-Z$][a-zA-Z0-9$_]*  {return new java_cup.runtime.Symbol(sym.ident, yyline, yycolumn);}
 
-"'"[^]"'"  {return new java_cup.runtime.Symbol(sym.constlit,yyline, yycolumn, yytext());}
+"'"[^]+"'"  {return new java_cup.runtime.Symbol(sym.constlit,yyline, yycolumn, yytext());}
 
 " "		{;}
 
