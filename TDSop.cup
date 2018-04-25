@@ -1,5 +1,10 @@
 import java_cup.runtime.*;
-action code {::}
+action code {:
+	boolean ident=false;
+	String ret;
+	String listaid="";
+	String h='';
+	:}
 
 parser code{:
 public void syntax_error(Symbol s){
@@ -32,37 +37,52 @@ precedence left mas, menos;
 precedence left or_logic, and_logic;
 
 PROGRAM ::= DEFINES:d PARTES:p {:RESULT='program '+'main'+';'+'\n'+d+'\n'+p;:};
-DEFINES ::=define ident:i CTES:c DEFINES:d {:RESULT=:'const'+'\n'+'\t'+i+'='+c+d;} |;
+DEFINES ::=define ident:i CTES:c DEFINES:d {:RESULT=:'const'+'\n'+'\t'+i+'='+c+';'+\n'+d;} |;
 CTES ::= numeric_integer_const:n1 {:RESULT=n1;:} | numeric_real_const:n2 {:RESULT=n2;:} | constlit:n3 {:RESULT=n3;:};
-PARTES ::= PART:p PARTES:ps {:RESULT=p+ps;:} | PART:p {:RESULT=:p;};
-PART ::= TYPE RESTPART {:RESULT=:};
-RESTPART ::= ident aperturaParentesis LISTPARAM cierreParentesis BLQ {:RESULT=:} 
-		| ident aperturaParentesis vvoid cierreParentesis BLQ {:RESULT=:};
-BLQ ::= aperturaLlaves SENTLIST:s cierreLlaves {:RESULT=':};
-LISTPARAM ::= LISTPARAM coma TYPE ident {:RESULT=:} | TYPE ident {:RESULT=:};
+PARTES ::= PART:p PARTES:ps {:RESULT=p+ps;:} | PART:p {:RESULT=:p+main;};
+PART ::= TYPE:t RESTPART:rp {:if ((t=='int')||(t=='float')) 
+				{h=': '+t; 
+				RESULT='function'+rp+';'+'\n';} 
+				else 
+				{RESULT='procedure '+rp+';'+'\n';}
+								:};
+RESTPART ::= ident:i aperturaParentesis:ap LISTPARAM:lp cierreParentesis:cp BLQ:b {:if (i=='main') 
+										{main='var'+'\n'+listaid+'\n'b;} 
+										else 
+										{RESULT=i+ap+lp+cp+h+'\n'+'var'+'\n'+listaid+'\n'+b}
+										listaid='';
+										:} 
+		| ident:i aperturaParentesis:ap vvoid cierreParentesis:cp BLQ:b {:if (i=='main') 
+										{main='var'+'\n'+listaid+'\n'b;} 
+										else 
+										{RESULT=i+ap+cp+h+'\n'+'var'+'\n'+listaid+'\n'+b;}
+										listaid='';
+										:};
+BLQ ::= aperturaLlaves SENTLIST:s cierreLlaves {:RESULT='begin'+'\n'+s+'end':};
+LISTPARAM ::= LISTPARAM:lp coma TYPE:t ident:i {:RESULT=lp+i+': '+t;:} | TYPE:t ident:i {:RESULT=i+': '+t;:};
 TYPE ::= vvoid {:RESULT='';:} | vint {:RESULT='INTEGER';:} | vfloat{:RESULT='REAL'::};
 
-SENTLIST ::= SENTLIST SENT {:RESULT=:} | SENT {:RESULT=:};
-SENT ::= TYPE:type LID:lid punto_coma:pcoma {:RESULT='var '+ lid + ' : ' + type + pcoma;:} 
+SENTLIST ::= SENTLIST:sl SENT:s {:RESULT=sl+s;:} | SENT:s {:RESULT=s;:};
+SENT ::= TYPE:type LID:lid punto_coma:pcoma {:listaid=listaid+lid + ' : ' + type + pcoma+'\n';:} 
 		| ident:i igual EXP:exp punto_coma:pcoma {:RESULT=i + ' := ' + exp + pcoma;:}
-		| ident aperturaParentesis LEXP cierreParentesis punto_coma {:RESULT=:}
-		| ident aperturaParentesis cierreParentesis punto_coma {:RESULT=:}
-		| vreturn EXP punto_coma {:RESULT=:}
-		| vif aperturaParentesis LCOND cierreParentesis BLQ velse BLQ {:RESULT=:}
-		| vwhile aperturaParentesis LCOND cierreParentesis BLQ {:RESULT=:}
-		| vdo BLQ vuntil aperturaParentesis LCOND cierreParentesis {:RESULT=:}
-		| vfor aperturaParentesis ident igual EXP punto_coma LCOND punto_coma ident igual EXP cierreParentesis BLQ {:RESULT=:};
-LID ::= ident:i {:RESULT=i;:} | LID:lid coma:coma ident:i {:RESULT= lid+coma+i;:};
+		| ident:i aperturaParentesis:ap LEXP:lexp cierreParentesis:cp punto_coma:pc {:RESULT=i+ap+lexp+cp+pc+'\n';:}
+		| ident:i aperturaParentesis:ap cierreParentesis:cp punto_coma:pc {:RESULT=i+ap+cp+pc+'\n':}
+		| vreturn EXP:exp punto_coma {:ret=exp;:}
+		| vif:iff aperturaParentesis:ap LCOND:lcond cierreParentesis:cp BLQ:b1 velse:elsee BLQ:b2 {:RESULT=iff+ap+lcond+cp+' then'+'\n'+b1+'\n'+elsee+'\n'+b2;:}
+		| vwhile:whilee aperturaParentesis LCOND:lcond cierreParentesis BLQ:b {:RESULT=whilee+lcond+' do'+'\n'+b;:} 
+		| vdo BLQ:b vuntil:untill aperturaParentesis LCOND:lp cierreParentesis {:RESULT='repeat'+'\n'+b+'\n'+untill+lcond+';';:}
+		| vfor:forr aperturaParentesis:ap ident:i igual:i EXP:exp punto_coma:pc LCOND:lcond punto_coma:pc ident:i igual:i EXP:exp cierreParentesis:cp BLQ:b {:RESULT=:};
+LID ::= ident:i {:RESULT=i;:} | LID:lid coma:coma ident:i {:RESULT=lid+coma+i;:};
 LEXP ::= EXP:exp {:RESULT=epx;:} | LEXP:lexp coma:coma EXP:exp {:RESULT=lexp+coma+exp;:};
 EXP ::= EXP:exp1 OP:op EXP:exp2 {:RESULT=exp1+op+exp2;:} | FACTOR:f {:RESULT=f;:};
 OP ::= mas:m {:RESULT=m;:} | menos:me {:RESULT=me;:} | mult:mu {:RESULT=mu;:} | diventera {:RESULT='mod';:} | divreal{:RESULT='div';:};
 FACTOR ::= ident:i aperturaParentesis LEXP:lexp cierreParentesis {:RESULT=i+'('+lexp+')';:}
-		| ident:i aperturaParentesis cierreParentesis {:RESULT=i+'('+')';:}
-		| aperturaParentesis EXP:exp cierreParentesis {:RESULT='('+exp+')';:}
+		| ident:i aperturaParentesis:ap cierreParentesis:cp {:RESULT=i+ap+cp;:}
+		| aperturaParentesis:ap EXP:exp cierreParentesis:cp {:RESULT=ap+exp+cp;:}
 		| ident:i {:RESULT=i;:}
 		| CTES:c {:RESULT=c;:};
 
-LCOND ::= LCOND:lcond1 OPL:op LCOND:lcond2 {:RESULT=lcond1+op+lcond2;:} | COND:c {:RESULT=c;:} | negacion COND:c {:RESULT='not'+c;:};
+LCOND ::= LCOND:lcond1 OPL:op LCOND:lcond2 {:RESULT=lcond1+op+lcond2;:} | COND:c {:RESULT=c;:} | negacion COND:c {:RESULT='not '+c;:};
 OPL ::= or_logic {:RESULT='or';:} | and_logic {:RESULT='and';:};
 COND ::= EXP:exp1 OPR:op EXP:exp2 {:RESULT=exp1+op+exp2;:};
 OPR::= comp_igual {:RESULT='=';:} | menor_que:meq {:RESULT=meq;:} | mayor_que:mq {:RESULT=mq;:} | mayor_igual_que:miq {:RESULT=miq;:} | menor_igual_que:meiq {:RESULT=meiq;:};
