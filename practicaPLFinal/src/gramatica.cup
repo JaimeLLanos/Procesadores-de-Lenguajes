@@ -1,0 +1,70 @@
+import java_cup.runtime.*;
+import java.util.List;
+import java.util.ArrayList;
+
+action code {:
+	
+	:}
+
+parser code{:
+public void syntax_error(Symbol s){
+
+		report_error("Error de sintaxis en la linea " + s.left + " caracter " + s.right + "\n", 		null);
+
+	}
+
+	
+	public void syntax_error(){
+
+		report_error("Error no puede haber dos funciones principales en el programa ", null);
+
+	}
+
+	
+	public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+
+		report_error("" , null);
+
+}
+:}
+
+terminal String define, aperturaParentesis, cierreParentesis, aperturaLlaves, vvoid, cierreLlaves, coma, vint, vfloat, punto_coma, mas, menos, mult, diventera, divreal, numeric_integer_const, numeric_real_const, constlit, igual, vreturn, ident, negacion, or_logic, and_logic, comp_igual, menor_que, mayor_que, mayor_igual_que, menor_igual_que, vif, velse, vwhile, vdo, vuntil, vfor;
+
+non terminal String  PROGRAM, DEFINES, CTES, LISTPARAM, TYPE, LID, EXP, LEXP, OP, FACTOR, LCOND, OPL, COND, OPR;
+non terminal Elementos SENT;
+non terminal ArrayList<Elementos> SENTLIST;
+non terminal Sentencia BLQ;
+non terminal Funciones RESTPART, PART;
+non terminal ArrayList<Funciones> PARTES;
+
+
+precedence left mult, diventera, divreal;
+precedence left mas, menos;
+precedence left or_logic, and_logic;
+
+PROGRAM ::= DEFINES:d PARTES:p {:Programa pr = new Programa(d,p); pr.imprime();:};
+DEFINES ::=define ident:i CTES:c DEFINES:d {:RESULT= "const"+"\n"+"\t"+i+"="+c+";"+"\n"+d;:} |{:RESULT = "";:};
+CTES ::= numeric_integer_const:n1 {:RESULT=n1;:} | numeric_real_const:n2 {:RESULT=n2;:} | constlit:n3 {:RESULT=n3;:};
+PARTES ::= PART:p PARTES:ps {:ps.add(p); RESULT = ps;:} | PART:p {:ArryList<Funciones> listaFun = new ArrayList<Funciones>(); listaFun.add(p); RESULT = listaFun;:};
+PART ::= TYPE:t RESTPART:rp {:rp.setType(t); RESUTL = rp;:};
+RESTPART ::= ident:i aperturaParentesis:ap LISTPARAM:lp cierreParentesis:cp BLQ:b {:Funciones fun = new Funciones(i,"(" + lp + ")",b); RESULT = fun;:} 
+		| ident:i aperturaParentesis vvoid cierreParentesis BLQ:b {:Funciones fun = new Funciones(i,"()",b); RESULT = fun;:};
+BLQ ::= aperturaLlaves SENTLIST:s cierreLlaves {:Sentencia se = new Sentencia(s); RESULT = se;:};
+LISTPARAM ::= LISTPARAM:lp coma TYPE:t ident:i {:RESULT=lp+i+": "+t;:} | TYPE:t ident:i {:RESULT=i+": "+t;:};
+TYPE ::= vvoid {:RESULT="";:} | vint {:RESULT="INTEGER";:} | vfloat{:RESULT="REAL";:};
+
+SENTLIST ::= SENTLIST:sl SENT:s {:sl.add(s); RESULT = sl;:} | SENT:s {:ArryList<Elementos> listaE = new ArrayList<Elementos>(); listaE.add(s); RESULT = listaE;:};
+SENT ::= TYPE:type LID:lid punto_coma:pcoma {:Elementos e = new Elementos(lid + " : " + type + pcoma+"\n", false); RESULT = e;:} 
+		| ident:i igual EXP:exp punto_coma:pcoma {:Elementos e = new Elementos(i + " := " + exp + pcoma+"\n", false); RESULT = e;:}
+		| ident:i aperturaParentesis:ap LEXP:lexp cierreParentesis:cp punto_coma:pc {:Elementos e = new Elementos(i+ap+lexp+cp+pc+"\n", false); RESULT = e;:}
+		| ident:i aperturaParentesis:ap cierreParentesis:cp punto_coma:pc {:Elementos e = new Elementos(i+ap+cp+pc+"\n", false); RESULT = e;:}
+		| vreturn:ret EXP:exp punto_coma:pc {:Elementos e = new Elementos(exp+pc, true); RESULT = e;:};
+LID ::= ident:i {:RESULT=i;:} | LID:lid coma:coma ident:i {:RESULT=lid+coma+i;:};
+LEXP ::= EXP:exp {:RESULT=epx;:} | LEXP:lexp coma:coma EXP:exp {:RESULT=lexp+coma+exp;:};
+EXP ::= EXP:exp1 OP:op EXP:exp2 {:RESULT=exp1+op+exp2;:} | FACTOR:f {:RESULT=f;:};
+OP ::= mas:m {:RESULT=m;:} | menos:me {:RESULT=me;:} | mult:mu {:RESULT=mu;:} | diventera {:RESULT="mod";:} | divreal{:RESULT="div";:};
+FACTOR ::= ident:i aperturaParentesis LEXP:lexp cierreParentesis {:RESULT=i+"("+lexp+")";:}
+		| ident:i aperturaParentesis:ap cierreParentesis:cp {:RESULT=i+ap+cp;:}
+		| aperturaParentesis:ap EXP:exp cierreParentesis:cp {:RESULT=ap+exp+cp;:}
+		| ident:i {:RESULT=i;:}
+		| CTES:c {:RESULT=c;:};
